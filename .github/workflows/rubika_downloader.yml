@@ -1,14 +1,16 @@
-name: Rubika Downloader Bot
+name: Download File to Repo
 
 on:
-  schedule:
-    - cron: '*/10 * * * *'   # هر ۱۰ دقیقه یک‌بار
-  workflow_dispatch:          # امکان اجرای دستی
+  workflow_dispatch:   # اجرای دستی از تب Actions
+  #schedule:
+  #  - cron: '0 0 * * *'  # در صورت تمایل به اجرای خودکار، این خط را از کامنت خارج کنید
 
 jobs:
-  bot:
+  download:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    permissions:
+      contents: write   # ⚠️ اجازهٔ push به ریپو
+
     steps:
       - uses: actions/checkout@v4
 
@@ -17,10 +19,17 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install requests
+      - name: Download file
+        run: python download_file.py
 
-      - name: Run bot
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: python rubika_downloader_bot.py
+      - name: Commit and push file
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "چیز جدیدی برای commit وجود ندارد."
+          else
+            git commit -m "دانلود خودکار فایل"
+            git push
+          fi

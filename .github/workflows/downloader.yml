@@ -1,0 +1,31 @@
+name: Rubika Downloader Bot
+
+on:
+  schedule:
+    - cron: '*/60 * * * *'        # هر ۶۰ دقیقه
+  workflow_dispatch:              # امکان اجرای دستی
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60           # حداکثر ۶۰ دقیقه (برای اطمینان)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -U pyrubi requests
+
+      - name: Restore session file from secret
+        env:
+          SESSION_B64: ${{ secrets.SESSION_BASE64 }}
+        run: |
+          echo "$SESSION_B64" | base64 -d > my_bot.session
+          ls -l my_bot.session
+
+      - name: Run bot
+        run: python download_bot.py

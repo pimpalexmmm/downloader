@@ -2,8 +2,8 @@ name: Rubika Downloader Bot
 
 on:
   schedule:
-    - cron: '*/60 * * * *'
-  workflow_dispatch:
+    - cron: '*/10 * * * *'   # هر ۱۰ دقیقه یک‌بار
+  workflow_dispatch:          # امکان اجرای دستی
 
 jobs:
   bot:
@@ -18,9 +18,9 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -U pyrubi requests
+        run: pip install requests
 
       - name: Run bot
         env:
-          ACCOUNT_JSON: ${{ secrets.ACCOUNT_JSON }}
-        run: python download_bot.py
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: python rubika_downloader_bot.py
